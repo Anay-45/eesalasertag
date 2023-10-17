@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const PlayerData = require("../model/data");
+const stats = require("../model/stats");
 const middle = require("../helper/apikey");
 
 router.use(middle);
@@ -74,18 +75,20 @@ router.delete("/deletealldata", async (req, res) => {
 
 router.patch("/resetall", async (req, res) => {
   try {
-    const result = await PlayerData.updateMany(
+    const result1 = await PlayerData.updateMany(
       {},
       {
         status: false,
         count: 0,
         hits: 0,
-        killedby: [],
       }
     );
+    const result2 = await stats.updateMany({}, { kills: 0, Players: [] });
     res
       .status(200)
-      .json({ result: `reseted sucessfully : ${result.modifiedCount} items` });
+      .json({
+        result: `reseted sucessfully : ${result1.modifiedCount} ${result2.modifiedCount} $ items`,
+      });
   } catch (ex) {
     res.status(500).json({ error: ex.message });
   }
